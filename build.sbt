@@ -1,14 +1,22 @@
-name := """siofoki-pets"""
-organization := "com.example"
 
-version := "1.0-SNAPSHOT"
+lazy val root =
+  (project in file("."))
+    .enablePlugins(PlayScala)
+    .settings(
+      name         := "siofoki-pets",
+      organization := "com.example",
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
+      version      := "1.0-SNAPSHOT",
 
-scalaVersion := "2.13.3"
+      scalaVersion := "2.13.3",
 
-libraryDependencies += guice
-libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test
+      libraryDependencies ++= Seq(
+        guice,
+        // Test
+        "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test
+      )
+
+    )
 
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "com.example.controllers._"
