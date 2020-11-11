@@ -10,10 +10,54 @@ lazy val root =
 
       scalaVersion := "2.13.3",
 
+      scalacOptions := Seq(
+        // Feature options
+        "-encoding", "utf-8",
+        "-explaintypes",
+        "-feature",
+        "-Ymacro-annotations",
+
+        // Warnings as errors!
+        "-Xfatal-warnings",
+        "-Wconf:src=app/models/db/.*:s,site=models\\.db\\.Tables.*:s,cat=unused-imports&src=.*/twirl/main/views/.*\\.template\\.scala:s",
+
+        // Linting options
+        "-unchecked",
+        "-Xcheckinit",
+        "-Xlint:adapted-args",
+        "-Xlint:constant",
+        "-Xlint:delayedinit-select",
+        // "-Xlint:deprecation", // causes unfilterable slick generated code warning at the moment...
+        "-Xlint:doc-detached",
+        "-Xlint:inaccessible",
+        "-Xlint:infer-any",
+        "-Xlint:missing-interpolator",
+        "-Xlint:nullary-unit",
+        "-Xlint:option-implicit",
+        "-Xlint:package-object-classes",
+        "-Xlint:poly-implicit-overload",
+        "-Xlint:private-shadow",
+        "-Xlint:stars-align",
+        "-Xlint:type-parameter-shadow",
+        "-Wdead-code",
+        "-Wextra-implicit",
+        "-Wnumeric-widen",
+        "-Wunused:implicits",
+        "-Wunused:imports",
+        "-Wunused:locals",
+        "-Wunused:params",
+        "-Wunused:patvars",
+        "-Wunused:privates",
+        "-Wvalue-discard",
+      ),
+
       libraryDependencies ++= Seq(
         guice,
+        "com.typesafe.play"      %% "play-slick"            % "5.0.0",
+        "com.typesafe.play"      %% "play-slick-evolutions" % "5.0.0",
+        "com.typesafe.slick"     %% "slick"                 % "3.3.3",
         // Test
-        "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % Test
+        "org.scalatestplus.play" %% "scalatestplus-play"    % "5.0.0" % Test
       )
 
     )
