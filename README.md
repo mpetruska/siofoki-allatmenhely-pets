@@ -1,4 +1,5 @@
 # Siofoki Állatvédő Alapítvány - Pets
+[![build status](https://api.travis-ci.com/mpetruska/siofoki-allatmenhely-pets.svg?branch=main)](https://travis-ci.com/github/mpetruska/siofoki-allatmenhely-pets)
 
 ## Requierements
 
