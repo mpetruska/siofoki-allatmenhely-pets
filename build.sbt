@@ -56,6 +56,7 @@ lazy val root =
         "com.typesafe.play"      %% "play-slick"            % "5.0.0",
         "com.typesafe.play"      %% "play-slick-evolutions" % "5.0.0",
         "com.typesafe.slick"     %% "slick"                 % "3.3.3",
+        "org.scalaz"             %% "scalaz-core"           % "7.3.2",
         // Test
         "org.scalatestplus.play" %% "scalatestplus-play"    % "5.0.0" % Test
       )
