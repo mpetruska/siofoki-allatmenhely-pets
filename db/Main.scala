@@ -1,22 +1,21 @@
-import slick.dbio.DBIO
+import java.net.URI
+
+import slick.basic.DatabaseConfig
 import slick.model._
 import slick.codegen._
+import slick.dbio.DBIO
+import slick.model.Model
+import slick.jdbc.JdbcProfile
+import slick.jdbc.meta.MTable
 
 import scala.concurrent.{Await, ExecutionContext}
 import scala.concurrent.duration.Duration
-import slick.jdbc.JdbcProfile
-import slick.jdbc.meta.MTable
-import slick.basic.DatabaseConfig
-import slick.model.Model
-import java.net.URI
-
-import slick.sql.SqlProfile.ColumnOption.SqlType
 
 object Main extends App {
 
   val profile    = "slick.jdbc.MySQLProfile"
   val jdbcDriver = "com.mysql.cj.jdbc.Driver"
-  val url        = "jdbc:mysql://localhost:3306/pets"
+  val url        = "jdbc:mysql://localhost:3306/pets?zeroDateTimeBehavior=convertToNull"
   val outputDir  = "../app/"
   val pkg        = "models.db"
   val user       = "pets-user"
@@ -28,7 +27,25 @@ object Main extends App {
   val db     = dbFactory.forURL(url, driver = jdbcDriver, user = user, password = password, keepAliveConnection = true)
   val models = Await.result(db.run(profileInstance.createModel(Some(MTable.getTables(None, Some("dbo"), None, Some(Seq("TABLE", "VIEW")))), true)(ExecutionContext.global).withPinnedSession), Duration.Inf)
 
-  val generator = new SourceCodeGenerator(models)
+  val generator = new SourceCodeGenerator(models) {
+
+    override def Table = new Table(_) {
+
+      override def Column = new Column(_) {
+        override def rawType = model.tpe match {
+          case "java.sql.Date" => "Option[java.sql.Date]"
+          case _               => super.rawType
+        }
+        // model.options.contains(sqlTypeDateTimeOffset) match {
+        //   case true  =>
+        //     println(s"!!!! ${model}")
+        //     super.rawType
+        //   case false => super.rawType
+        // }
+      }
+    }
+  }
+
   println("Generating Slick models...")
   generator.writeToMultipleFiles(profile, outputDir, pkg)
   println("Slick models generated!")

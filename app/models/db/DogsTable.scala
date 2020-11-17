@@ -34,17 +34,17 @@ trait DogsTable {
    *  @param dDate Database column D_DATE SqlType(DATE)
    *  @param comment Database column COMMENT SqlType(TEXT)
    *  @param web Database column WEB SqlType(VARCHAR), Length(100,true) */
-  case class DogsRow(dogId: Int, dogName: String, sex: String, breed: String, colour: String, hair: String, bDate: java.sql.Date, estimated: Boolean, marm: Int, chip: String, bookNbr: String, befPlace: String, befDate: java.sql.Date, befCond: String, charact: String, ivDate: java.sql.Date, iv: Boolean = false, status: String, ownerId: Int, adoptDate: java.sql.Date, dDate: java.sql.Date, comment: String, web: String)
+  case class DogsRow(dogId: Int, dogName: String, sex: String, breed: String, colour: String, hair: String, bDate: Option[java.sql.Date], estimated: Boolean, marm: Int, chip: String, bookNbr: String, befPlace: String, befDate: Option[java.sql.Date], befCond: String, charact: String, ivDate: Option[java.sql.Date], iv: Boolean = false, status: String, ownerId: Int, adoptDate: Option[java.sql.Date], dDate: Option[java.sql.Date], comment: String, web: String)
   /** GetResult implicit for fetching DogsRow objects using plain SQL queries */
-  implicit def GetResultDogsRow(implicit e0: GR[Int], e1: GR[String], e2: GR[java.sql.Date], e3: GR[Boolean]): GR[DogsRow] = GR{
+  implicit def GetResultDogsRow(implicit e0: GR[Int], e1: GR[String], e2: GR[Option[java.sql.Date]], e3: GR[Boolean]): GR[DogsRow] = GR{
     prs => import prs._
-    DogsRow(<<[Int], <<[String], <<[String], <<[String], <<[String], <<[String], <<[java.sql.Date], <<[Boolean], <<[Int], <<[String], <<[String], <<[String], <<[java.sql.Date], <<[String], <<[String], <<[java.sql.Date], <<[Boolean], <<[String], <<[Int], <<[java.sql.Date], <<[java.sql.Date], <<[String], <<[String])
+    DogsRow(<<[Int], <<[String], <<[String], <<[String], <<[String], <<[String], <<[Option[java.sql.Date]], <<[Boolean], <<[Int], <<[String], <<[String], <<[String], <<[Option[java.sql.Date]], <<[String], <<[String], <<[Option[java.sql.Date]], <<[Boolean], <<[String], <<[Int], <<[Option[java.sql.Date]], <<[Option[java.sql.Date]], <<[String], <<[String])
   }
   /** Table description of table dogs. Objects of this class serve as prototypes for rows in queries. */
   class Dogs(_tableTag: Tag) extends profile.api.Table[DogsRow](_tableTag, Some("pets"), "dogs") {
     def * = (dogId :: dogName :: sex :: breed :: colour :: hair :: bDate :: estimated :: marm :: chip :: bookNbr :: befPlace :: befDate :: befCond :: charact :: ivDate :: iv :: status :: ownerId :: adoptDate :: dDate :: comment :: web :: HNil).mapTo[DogsRow]
     /** Maps whole row to an option. Useful for outer joins. */
-    def ? = (Rep.Some(dogId) :: Rep.Some(dogName) :: Rep.Some(sex) :: Rep.Some(breed) :: Rep.Some(colour) :: Rep.Some(hair) :: Rep.Some(bDate) :: Rep.Some(estimated) :: Rep.Some(marm) :: Rep.Some(chip) :: Rep.Some(bookNbr) :: Rep.Some(befPlace) :: Rep.Some(befDate) :: Rep.Some(befCond) :: Rep.Some(charact) :: Rep.Some(ivDate) :: Rep.Some(iv) :: Rep.Some(status) :: Rep.Some(ownerId) :: Rep.Some(adoptDate) :: Rep.Some(dDate) :: Rep.Some(comment) :: Rep.Some(web) :: HNil).shaped.<>(r => DogsRow(r(0).asInstanceOf[Option[Int]].get, r(1).asInstanceOf[Option[String]].get, r(2).asInstanceOf[Option[String]].get, r(3).asInstanceOf[Option[String]].get, r(4).asInstanceOf[Option[String]].get, r(5).asInstanceOf[Option[String]].get, r(6).asInstanceOf[Option[java.sql.Date]].get, r(7).asInstanceOf[Option[Boolean]].get, r(8).asInstanceOf[Option[Int]].get, r(9).asInstanceOf[Option[String]].get, r(10).asInstanceOf[Option[String]].get, r(11).asInstanceOf[Option[String]].get, r(12).asInstanceOf[Option[java.sql.Date]].get, r(13).asInstanceOf[Option[String]].get, r(14).asInstanceOf[Option[String]].get, r(15).asInstanceOf[Option[java.sql.Date]].get, r(16).asInstanceOf[Option[Boolean]].get, r(17).asInstanceOf[Option[String]].get, r(18).asInstanceOf[Option[Int]].get, r(19).asInstanceOf[Option[java.sql.Date]].get, r(20).asInstanceOf[Option[java.sql.Date]].get, r(21).asInstanceOf[Option[String]].get, r(22).asInstanceOf[Option[String]].get), (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
+    def ? = (Rep.Some(dogId) :: Rep.Some(dogName) :: Rep.Some(sex) :: Rep.Some(breed) :: Rep.Some(colour) :: Rep.Some(hair) :: Rep.Some(bDate) :: Rep.Some(estimated) :: Rep.Some(marm) :: Rep.Some(chip) :: Rep.Some(bookNbr) :: Rep.Some(befPlace) :: Rep.Some(befDate) :: Rep.Some(befCond) :: Rep.Some(charact) :: Rep.Some(ivDate) :: Rep.Some(iv) :: Rep.Some(status) :: Rep.Some(ownerId) :: Rep.Some(adoptDate) :: Rep.Some(dDate) :: Rep.Some(comment) :: Rep.Some(web) :: HNil).shaped.<>(r => DogsRow(r(0).asInstanceOf[Option[Int]].get, r(1).asInstanceOf[Option[String]].get, r(2).asInstanceOf[Option[String]].get, r(3).asInstanceOf[Option[String]].get, r(4).asInstanceOf[Option[String]].get, r(5).asInstanceOf[Option[String]].get, r(6).asInstanceOf[Option[Option[java.sql.Date]]].get, r(7).asInstanceOf[Option[Boolean]].get, r(8).asInstanceOf[Option[Int]].get, r(9).asInstanceOf[Option[String]].get, r(10).asInstanceOf[Option[String]].get, r(11).asInstanceOf[Option[String]].get, r(12).asInstanceOf[Option[Option[java.sql.Date]]].get, r(13).asInstanceOf[Option[String]].get, r(14).asInstanceOf[Option[String]].get, r(15).asInstanceOf[Option[Option[java.sql.Date]]].get, r(16).asInstanceOf[Option[Boolean]].get, r(17).asInstanceOf[Option[String]].get, r(18).asInstanceOf[Option[Int]].get, r(19).asInstanceOf[Option[Option[java.sql.Date]]].get, r(20).asInstanceOf[Option[Option[java.sql.Date]]].get, r(21).asInstanceOf[Option[String]].get, r(22).asInstanceOf[Option[String]].get), (_:Any) =>  throw new Exception("Inserting into ? projection not supported."))
 
     /** Database column DOG_ID SqlType(INT), AutoInc, PrimaryKey */
     val dogId: Rep[Int] = column[Int]("DOG_ID", O.AutoInc, O.PrimaryKey)
@@ -59,7 +59,7 @@ trait DogsTable {
     /** Database column HAIR SqlType(VARCHAR), Length(3,true) */
     val hair: Rep[String] = column[String]("HAIR", O.Length(3,varying=true))
     /** Database column B_DATE SqlType(DATE) */
-    val bDate: Rep[java.sql.Date] = column[java.sql.Date]("B_DATE")
+    val bDate: Rep[Option[java.sql.Date]] = column[Option[java.sql.Date]]("B_DATE")
     /** Database column ESTIMATED SqlType(BIT) */
     val estimated: Rep[Boolean] = column[Boolean]("ESTIMATED")
     /** Database column MARM SqlType(INT) */
@@ -71,13 +71,13 @@ trait DogsTable {
     /** Database column BEF_PLACE SqlType(VARCHAR), Length(30,true) */
     val befPlace: Rep[String] = column[String]("BEF_PLACE", O.Length(30,varying=true))
     /** Database column BEF_DATE SqlType(DATE) */
-    val befDate: Rep[java.sql.Date] = column[java.sql.Date]("BEF_DATE")
+    val befDate: Rep[Option[java.sql.Date]] = column[Option[java.sql.Date]]("BEF_DATE")
     /** Database column BEF_COND SqlType(TEXT) */
     val befCond: Rep[String] = column[String]("BEF_COND")
     /** Database column CHARACT SqlType(TEXT) */
     val charact: Rep[String] = column[String]("CHARACT")
     /** Database column IV_DATE SqlType(DATE) */
-    val ivDate: Rep[java.sql.Date] = column[java.sql.Date]("IV_DATE")
+    val ivDate: Rep[Option[java.sql.Date]] = column[Option[java.sql.Date]]("IV_DATE")
     /** Database column IV SqlType(BIT), Default(false) */
     val iv: Rep[Boolean] = column[Boolean]("IV", O.Default(false))
     /** Database column STATUS SqlType(VARCHAR), Length(3,true) */
@@ -85,9 +85,9 @@ trait DogsTable {
     /** Database column OWNER_ID SqlType(INT) */
     val ownerId: Rep[Int] = column[Int]("OWNER_ID")
     /** Database column ADOPT_DATE SqlType(DATE) */
-    val adoptDate: Rep[java.sql.Date] = column[java.sql.Date]("ADOPT_DATE")
+    val adoptDate: Rep[Option[java.sql.Date]] = column[Option[java.sql.Date]]("ADOPT_DATE")
     /** Database column D_DATE SqlType(DATE) */
-    val dDate: Rep[java.sql.Date] = column[java.sql.Date]("D_DATE")
+    val dDate: Rep[Option[java.sql.Date]] = column[Option[java.sql.Date]]("D_DATE")
     /** Database column COMMENT SqlType(TEXT) */
     val comment: Rep[String] = column[String]("COMMENT")
     /** Database column WEB SqlType(VARCHAR), Length(100,true) */

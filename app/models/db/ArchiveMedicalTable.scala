@@ -14,11 +14,11 @@ trait ArchiveMedicalTable {
    *  @param `type` Database column TYPE SqlType(VARCHAR), Length(2,true)
    *  @param mDesc Database column M_DESC SqlType(TEXT)
    *  @param doctor Database column DOCTOR SqlType(VARCHAR), Length(25,true) */
-  case class ArchiveMedicalRow(dogId: Int, date: java.sql.Date, `type`: String, mDesc: String, doctor: String)
+  case class ArchiveMedicalRow(dogId: Int, date: Option[java.sql.Date], `type`: String, mDesc: String, doctor: String)
   /** GetResult implicit for fetching ArchiveMedicalRow objects using plain SQL queries */
-  implicit def GetResultArchiveMedicalRow(implicit e0: GR[Int], e1: GR[java.sql.Date], e2: GR[String]): GR[ArchiveMedicalRow] = GR{
+  implicit def GetResultArchiveMedicalRow(implicit e0: GR[Int], e1: GR[Option[java.sql.Date]], e2: GR[String]): GR[ArchiveMedicalRow] = GR{
     prs => import prs._
-    ArchiveMedicalRow.tupled((<<[Int], <<[java.sql.Date], <<[String], <<[String], <<[String]))
+    ArchiveMedicalRow.tupled((<<[Int], <<[Option[java.sql.Date]], <<[String], <<[String], <<[String]))
   }
   /** Table description of table archive_medical. Objects of this class serve as prototypes for rows in queries.
    *  NOTE: The following names collided with Scala keywords and were escaped: type */
@@ -30,7 +30,7 @@ trait ArchiveMedicalTable {
     /** Database column DOG_ID SqlType(INT) */
     val dogId: Rep[Int] = column[Int]("DOG_ID")
     /** Database column DATE SqlType(DATE) */
-    val date: Rep[java.sql.Date] = column[java.sql.Date]("DATE")
+    val date: Rep[Option[java.sql.Date]] = column[Option[java.sql.Date]]("DATE")
     /** Database column TYPE SqlType(VARCHAR), Length(2,true)
      *  NOTE: The name was escaped because it collided with a Scala keyword. */
     val `type`: Rep[String] = column[String]("TYPE", O.Length(2,varying=true))

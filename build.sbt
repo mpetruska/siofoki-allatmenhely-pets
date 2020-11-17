@@ -42,10 +42,8 @@ lazy val root =
         "-Wdead-code",
         "-Wextra-implicit",
         "-Wnumeric-widen",
-        "-Wunused:implicits",
         "-Wunused:imports",
         "-Wunused:locals",
-        "-Wunused:params",
         "-Wunused:patvars",
         "-Wunused:privates",
         "-Wvalue-discard",
@@ -57,8 +55,9 @@ lazy val root =
         "com.typesafe.play"      %% "play-slick-evolutions" % "5.0.0",
         "com.typesafe.slick"     %% "slick"                 % "3.3.3",
         "org.scalaz"             %% "scalaz-core"           % "7.3.2",
+        "mysql"                  %  "mysql-connector-java"  % "8.0.22",
         // Test
-        "org.scalatestplus.play" %% "scalatestplus-play"    % "5.0.0" % Test
+        "org.scalatestplus.play" %% "scalatestplus-play"    % "5.0.0" % Test,
       )
 
     )
