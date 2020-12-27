@@ -12,3 +12,6 @@ cache:
     - $HOME/.cache/coursier
     - $HOME/.ivy2/cache
     - $HOME/.sbt
+
+notifications:
+  slack: siofoki-allatmenhely:w8xtXMAIuCAs0LcmKo7THeWd
