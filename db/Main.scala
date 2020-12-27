@@ -36,12 +36,6 @@ object Main extends App {
           case "java.sql.Date" => "Option[java.sql.Date]"
           case _               => super.rawType
         }
-        // model.options.contains(sqlTypeDateTimeOffset) match {
-        //   case true  =>
-        //     println(s"!!!! ${model}")
-        //     super.rawType
-        //   case false => super.rawType
-        // }
       }
     }
   }

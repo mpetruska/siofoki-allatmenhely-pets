@@ -1,5 +1,12 @@
-@()
+@import scalaz.syntax.std.option._
+
+@(usernameOption: Option[String])
 
 @main("Welcome to Play") {
-  <h1>Welcome to Play!</h1>
+  @usernameOption.cata(
+    some = username =>
+      <h1>Welcome to Play, {username}!</h1>,
+    none =
+      <h1>Welcome to Play!</h1>
+  )
 }

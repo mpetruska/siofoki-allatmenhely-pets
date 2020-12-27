@@ -1,0 +1,22 @@
+@import helper._
+@import models.forms.UserLogin
+
+@(userLogin: Form[UserLogin])(implicit messages: Messages, request: RequestHeader)
+
+@main("Login") {
+  <h1>Login</h1>
+  @form(action = routes.UserController.login()) {
+    @CSRF.formField
+    @inputText(userLogin("username"))
+    @inputPassword(userLogin("password"))
+    @checkbox(userLogin("isPermanent"))
+    <input type="Submit" value="Login" />
+  }
+  @if(userLogin.hasGlobalErrors) {
+    <ul>
+    @for(error <- userLogin.globalErrors) {
+      <li>@error.format</li>
+    }
+    </ul>
+  }
+}

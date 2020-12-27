@@ -15,6 +15,7 @@ lazy val root =
         "-encoding", "utf-8",
         "-explaintypes",
         "-feature",
+        "-deprecation",
         "-Ymacro-annotations",
 
         // Warnings as errors!
@@ -27,7 +28,7 @@ lazy val root =
         "-Xlint:adapted-args",
         "-Xlint:constant",
         "-Xlint:delayedinit-select",
-        // "-Xlint:deprecation", // causes unfilterable slick generated code warning at the moment...
+        "-Xlint:deprecation",
         "-Xlint:doc-detached",
         "-Xlint:inaccessible",
         "-Xlint:infer-any",
@@ -49,8 +50,12 @@ lazy val root =
         "-Wvalue-discard",
       ),
 
+      Compile / console / scalacOptions := Seq.empty,
+
       libraryDependencies ++= Seq(
         guice,
+        evolutions,
+        "org.mindrot"            %  "jbcrypt"               % "0.4",
         "com.typesafe.play"      %% "play-slick"            % "5.0.0",
         "com.typesafe.play"      %% "play-slick-evolutions" % "5.0.0",
         "com.typesafe.slick"     %% "slick"                 % "3.3.3",

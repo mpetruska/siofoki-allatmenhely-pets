@@ -7,6 +7,10 @@ target
 /.settings
 /RUNNING_PID
 
+# Metals
+
+#metals.sbt
+
 # Idea
 
 /.idea
@@ -20,4 +24,5 @@ target
 .vscode
 
 # Secrets
+
 /dev_setup/docker-entrypoint-initdb.d/00_initial_structure_and_data.sql
