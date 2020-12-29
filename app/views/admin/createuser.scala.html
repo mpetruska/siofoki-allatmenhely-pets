@@ -1,0 +1,25 @@
+@import helper._
+@import models.forms.CreateUser
+
+@(createUser: Form[CreateUser])(implicit messages: Messages, request: RequestHeader)
+
+@main("New user") {
+  <h1>New user</h1>
+  @form(action = routes.UserController.createUser()) {
+    @CSRF.formField
+    @inputText(createUser("username"))
+    @inputText(createUser("fullName"))
+    @inputPassword(createUser("password"))
+    @inputPassword(createUser("passwordRepeat"))
+    @checkbox(createUser("isAdmin"))
+    @checkbox(createUser("isEnabled"))
+    <input type="Submit" value="Create" />
+  }
+  @if(createUser.hasGlobalErrors) {
+    <ul>
+    @for(error <- createUser.globalErrors) {
+      <li>@error.format</li>
+    }
+    </ul>
+  }
+}

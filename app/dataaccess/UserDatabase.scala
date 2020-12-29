@@ -2,6 +2,7 @@ package dataaccess
 
 import java.util.UUID
 
+import extensions.aliases._
 import extensions.db.DbRunHelpers
 import extensions.uuid._
 import javax.inject._
@@ -37,6 +38,25 @@ class UserDatabase @Inject()
       .take(1)
       .result
       .headOption
+  }
+
+  def getAll() = db.run(dbioGetAll())
+  def dbioGetAll(): DBIO[Seq[PetsUserRow]] = users.result
+
+  def createUser = dbRun(dbioCreateUser _) _
+  def dbioCreateUser(id: UUID, username: String, fullName: Option[String], password: Option[String], isAdmin: Boolean, isEnabled: Boolean): DBIO[I] = {
+    users
+      .map(r => (r.id,             r.username, r.fullName, r.password, r.isAdmin, r.isEnabled))
+      .+= (     (  uuidToBlob(id),   username,   fullName,   password,   isAdmin,   isEnabled))
+      .map(tott)
+  }
+
+  def deleteUser = dbRun(dbioDeleteUser _) _
+  def dbioDeleteUser(userId: UUID): DBIO[I] = {
+    users
+      .filter(_.id === uuidToBlob(userId))
+      .delete
+      .map(tott)
   }
   
 }

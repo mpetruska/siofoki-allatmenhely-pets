@@ -1,0 +1,25 @@
+@import extensions.uuid._
+@import helper._
+@import models.db.Tables.PetsUserRow
+@import scalaz.\/
+
+@(userId: String, userOrError: String \/ PetsUserRow)(implicit messages: Messages, request: RequestHeader)
+
+@showform(user: PetsUserRow) = {
+  @form(action = routes.UserController.deleteUser(userId)) {
+    @CSRF.formField
+    <p>
+      Delete user @user.username
+    </p>
+    <input type="Submit" value="Delete" />
+  }
+}
+
+@main("Delete user") {
+  <h1>Delete user</h1>
+  @userOrError.fold(
+    l = error =>
+      <p>{error}</p>,
+    r = user => showform(user)
+  )
+}

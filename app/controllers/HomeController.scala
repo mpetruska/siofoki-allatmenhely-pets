@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject._
 import play.api.mvc._
+import scalaz.syntax.std.option._
 
 import scala.concurrent.ExecutionContext
 
@@ -13,9 +14,13 @@ class HomeController @Inject()(
 
   implicit val executor: ExecutionContext = controllerComponents.executionContext
 
-  def index() = userAction(parse.anyContent) { implicit request =>
-    Ok(views.html.index(request.userRow
-      .map(user => user.fullName getOrElse user.username)
-    ))
+  def index() = Action.async(parse.anyContent) { implicit request =>
+    userAction.refine(request)
+      .map(_.fold(
+        fa = _ => Ok(views.html.index(None)),
+        fb = { userRequest =>
+          Ok(views.html.index((userRequest.userRow.fullName getOrElse userRequest.userRow.username).some))
+        }
+      ))
   }
 }

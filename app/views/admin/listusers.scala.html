@@ -1,0 +1,42 @@
+@import helper._
+@import models.forms.UserListRow
+@import scalaz.syntax.std.boolean._
+
+@(users: Seq[UserListRow])(implicit messages: Messages, request: RequestHeader)
+
+@actionLink(actionLink: controllers.ReverseUserController => Call, text: String) = {
+  <a class="action_link" href=@actionLink(routes.UserController).relative>@text</a>
+}
+
+@main("Users") {
+  <h1>Users</h1>
+  <p>
+    <a class="action_link" href=@routes.UserController.showCreateUserForm()>new user</a>
+  </p>
+  <table>
+    <thead>
+      <tr>
+        <td>Username</td>
+        <td>Full name</td>
+        <td>Admin?</td>
+        <td>Enabled?</td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </thead>
+    <tbody>
+      @for(user <- users) {
+        <tr>
+          <td>@user.username</td>
+          <td>@user.fullName</td>
+          <td>@user.isAdmin.fold(t = "yes", f = "no")</td>
+          <td>@user.isEnabled.fold(t = "yes", f = "no")</td>
+          <td>@user.canUpdatePassword.fold(actionLink(_.showUpdatePasswordForm(user.id.toString), "update password"), f = "")</td>
+          <td>@user.canUpdate.fold(t = actionLink(_.showUpdateUserForm(user.id.toString), "update user"), f = "")</td>
+          <td>@user.canDelete.fold(t = actionLink(_.showDeleteUserForm(user.id.toString), "delete"), f = "")</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}

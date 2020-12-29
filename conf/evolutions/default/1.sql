@@ -2,14 +2,14 @@
 
 CREATE TABLE pets_user(
   id         VARBINARY(16) NOT NULL,
-  username   TEXT NOT NULL,
+  username   VARCHAR(200) NOT NULL,
   full_name  TEXT,
   password   TEXT,
   is_admin   BOOLEAN NOT NULL,
   is_enabled BOOLEAN NOT NULL,
 
   PRIMARY KEY (id),
-  INDEX ix_user_username(username(200))
+  UNIQUE INDEX uq_user_username(username)
 );
 
 INSERT INTO pets_user
