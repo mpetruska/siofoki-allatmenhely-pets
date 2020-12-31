@@ -131,9 +131,47 @@ class UserController @Inject()(
     )
   }
 
-  def showUpdatePasswordForm(userId: String) = TODO
+  def showUpdatePasswordForm(userId: String) = userAction { implicit request =>
+    val uuidOption        = uuidFromString(userId)
+    val canUpdatePassword =
+      uuidOption.isDefined &&
+      ((uuidFromBlob(request.userRow.id).map(_.toString) == uuidFromString(userId)) ||
+       request.userRow.isAdmin)
 
-  def updatePassword(userId: String) = TODO
+    canUpdatePassword.fold(
+      t = Ok(views.html.admin.updatepassword(userId, UpdatePassword.form)),
+      f = Forbidden(Errors.NotAuthorized)
+    )
+  }
+
+  def updatePassword(userId: String) = userAction.async(parse.anyContent) { implicit request =>
+    val uuidOption        = uuidFromString(userId)
+    val canUpdatePassword =
+      uuidOption.isDefined &&
+      ((uuidFromBlob(request.userRow.id).map(_.toString) == uuidFromString(userId)) ||
+       request.userRow.isAdmin)
+
+    uuidOption.filter(Function.const(canUpdatePassword)).cata(
+      some = id =>
+        UpdatePassword.form.bindFromRequest().fold(
+          hasErrors = { formWithErrors =>
+            Future.successful(BadRequest(views.html.admin.updatepassword(userId, formWithErrors)))
+          },
+          success = { updatePassword =>
+            (for {
+              _        <- failIfFalse(updatePassword.password == updatePassword.passwordRepeat, Errors.PasswordMismatch)
+              password =  BCrypt.hashpw(updatePassword.password, BCrypt.gensalt())
+              _        <- userDatabase.updateUser(id)(_.copy(password = password.some))
+            } yield Redirect(routes.UserController.listUsers()))
+              .recoverWith {
+                case error: IllegalArgumentException =>
+                  val form = UpdatePassword.form.fill(updatePassword).withGlobalError(error.getMessage())
+                  Future.successful(BadRequest(views.html.admin.updatepassword(userId, form)))
+              }
+          }),
+      none = Future.successful(Forbidden(Errors.NotAuthorized))
+    )
+  }
 
   def showUpdateUserForm(userId: String) = TODO
 
