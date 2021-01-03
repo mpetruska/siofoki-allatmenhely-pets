@@ -46,7 +46,7 @@ class UserController @Inject()(
           _              <- failIfFalse(userRow.isEnabled,                                  Errors.LoginFailed)
           hashedPassword <- failIfNone (userRow.password,                                   Errors.LoginFailed)
           _              <- failIfFalse(BCrypt.checkpw(userLogin.password, hashedPassword), Errors.LoginFailed)
-          userId         <- failIfNone (uuidFromBlob(userRow.id),                           Errors.InternalServerError)
+          userId         <- failIfNone (uuidFromString(userRow.id),                         Errors.InternalServerError)
           sessionId      =  UUID.randomUUID()
           _              <- sessionDatabase.createSession(sessionId, userId, controllerComponents.mockableTime.currentTime(), userLogin.isPermanent)
         } yield Redirect(routes.HomeController.index()).withSession("sessionId" -> sessionId.toString()))
@@ -73,7 +73,7 @@ class UserController @Inject()(
     val loggedInUser = request.userRow
     val users = (for {
       userRow <- future.listT(userDatabase.getAll().map(_.sortBy(_.username)))
-      id      <- future.fromSeq(uuidFromBlob(userRow.id).toSeq)
+      id      <- future.fromSeq(uuidFromString(userRow.id).toSeq)
       user    =  UserListRow(
         id                = id,
         username          = userRow.username,
@@ -81,7 +81,7 @@ class UserController @Inject()(
         isAdmin           = userRow.isAdmin,
         isEnabled         = userRow.isEnabled,
         canUpdatePassword = loggedInUser.isAdmin,
-        canDelete         = loggedInUser.isAdmin && (userRow.username != "root"),
+        canDelete         = loggedInUser.isAdmin && (userRow.username != RootUsername),
         canUpdate         = loggedInUser.isAdmin,
       )
     } yield user).run
@@ -135,7 +135,7 @@ class UserController @Inject()(
     val uuidOption        = uuidFromString(userId)
     val canUpdatePassword =
       uuidOption.isDefined &&
-      ((uuidFromBlob(request.userRow.id).map(_.toString) == uuidFromString(userId)) ||
+      ((uuidFromString(request.userRow.id).map(_.toString) == uuidFromString(userId)) ||
        request.userRow.isAdmin)
 
     canUpdatePassword.fold(
@@ -148,7 +148,7 @@ class UserController @Inject()(
     val uuidOption        = uuidFromString(userId)
     val canUpdatePassword =
       uuidOption.isDefined &&
-      ((uuidFromBlob(request.userRow.id).map(_.toString) == uuidFromString(userId)) ||
+      ((uuidFromString(request.userRow.id).map(_.toString) == uuidFromString(userId)) ||
        request.userRow.isAdmin)
 
     uuidOption.filter(Function.const(canUpdatePassword)).cata(
@@ -173,9 +173,55 @@ class UserController @Inject()(
     )
   }
 
-  def showUpdateUserForm(userId: String) = TODO
+  def showUpdateUserForm(userId: String) = userAction.async(parse.anyContent) { implicit request =>
+    request.userRow.isAdmin.fold(
+      t = {
+        (for {
+          uuid    <- failIfNone(uuidFromString(userId),      Errors.UserNotFound)
+          userRow <- failIfNone(userDatabase.findById(uuid), Errors.UserNotFound)
+          form    =  UpdateUser.form.fill(UpdateUser(
+            fullName  = userRow.fullName,
+            isEnabled = userRow.isEnabled,
+            isAdmin   = userRow.isAdmin,
+          ))
+        } yield Ok(views.html.admin.updateuser(userId, form)))
+          .recoverWith {
+            case error: IllegalArgumentException =>
+              val form = UpdateUser.form.withGlobalError(error.getMessage())
+              Future.successful(BadRequest(views.html.admin.updateuser(userId, form)))
+          }
+      },
+      f = Future.successful(Forbidden(Errors.NotAuthorized))
+    )
+  }
 
-  def updateUser(userId: String) = TODO
+  def updateUser(userId: String) = userAction.async(parse.anyContent) { implicit request =>
+    request.userRow.isAdmin.fold(
+      t =
+        UpdateUser.form.bindFromRequest().fold(
+          hasErrors = { formWithErrors =>
+            Future.successful(BadRequest(views.html.admin.updateuser(userId, formWithErrors)))
+          },
+          success = { updateUser =>
+            (for {
+              uuid     <- failIfNone(uuidFromString(userId), Errors.UserNotFound)
+              fullName =  updateUser.fullName.filter(_.nonEmpty)
+              _        <- userDatabase.updateUser(uuid)(oldUser => oldUser.copy(
+                fullName  = fullName,
+                isEnabled = (oldUser.username == RootUsername) || updateUser.isEnabled,
+                isAdmin   = (oldUser.username == RootUsername) || updateUser.isAdmin,
+              ))
+            } yield Redirect(routes.UserController.listUsers()))
+              .recoverWith {
+                case error: IllegalArgumentException =>
+                  val form = UpdateUser.form.fill(updateUser).withGlobalError(error.getMessage())
+                  Future.successful(BadRequest(views.html.admin.updateuser(userId, form)))
+              }
+          }
+        ),
+      f = Future.successful(Forbidden(Errors.NotAuthorized))
+    )
+  }
 
   def showDeleteUserForm(userId: String) = userAction.async(parse.anyContent) { implicit request =>
     request.userRow.isAdmin.fold(
@@ -197,8 +243,10 @@ class UserController @Inject()(
     request.userRow.isAdmin.fold(
       t = {
         (for {
-          uuid <- failIfNone(uuidFromString(userId), Errors.UserNotFound)
-          user <- userDatabase.deleteUser(uuid)
+          uuid    <- failIfNone (uuidFromString(userId),           Errors.UserNotFound)
+          userRow <- failIfNone (userDatabase.findById(uuid),      Errors.UserNotFound)
+          _       <- failIfFalse(userRow.username == RootUsername, Errors.RootCannotBeDeleted)
+          user    <- userDatabase.deleteUser(uuid)
         } yield Redirect(routes.UserController.listUsers()))
           .recover {
             case error =>
@@ -213,11 +261,14 @@ class UserController @Inject()(
 
 object UserController {
 
+  val RootUsername = "root"
+
   object Errors extends CommonErrors {
-    val LoginFailed      = "login_failed"
-    val NotAuthorized    = "not_authorized"
-    val PasswordMismatch = "password_mismatch"
-    val UserNotFound     = "user_not_found"
+    val LoginFailed         = "login_failed"
+    val NotAuthorized       = "not_authorized"
+    val PasswordMismatch    = "password_mismatch"
+    val RootCannotBeDeleted = "root_cannot_be_deleted"
+    val UserNotFound        = "user_not_found"
   }
 
 }

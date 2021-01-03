@@ -9,7 +9,7 @@
   @form(action = routes.UserController.deleteUser(userId)) {
     @CSRF.formField
     <p>
-      Delete user @user.username
+      Delete user @user.username?
     </p>
     <input type="Submit" value="Delete" />
   }

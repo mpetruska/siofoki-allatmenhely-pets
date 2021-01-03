@@ -1,0 +1,22 @@
+@import helper._
+@import models.forms.UpdateUser
+
+@(userId: String, updateUser: Form[UpdateUser])(implicit messages: Messages, request: RequestHeader)
+
+@main("Edit user") {
+  <h1>Edit user</h1>
+  @form(action = routes.UserController.updateUser(userId)) {
+    @CSRF.formField
+    @inputText(updateUser("fullName"))
+    @checkbox(updateUser("isAdmin"))
+    @checkbox(updateUser("isEnabled"))
+    <input type="Submit" value="Update" />
+  }
+  @if(updateUser.hasGlobalErrors) {
+    <ul>
+    @for(error <- updateUser.globalErrors) {
+      <li>@error.format</li>
+    }
+    </ul>
+  }
+}

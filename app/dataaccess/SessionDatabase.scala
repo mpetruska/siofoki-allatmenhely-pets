@@ -1,12 +1,11 @@
 package dataaccess
 
-import java.util.UUID
 import java.time.OffsetDateTime
+import java.util.UUID
 
 import extensions.aliases._
 import extensions.db.DbRunHelpers
 import extensions.time._
-import extensions.uuid._
 import javax.inject._
 import models.db.Tables._
 import play.api.db.slick._
@@ -24,13 +23,12 @@ class SessionDatabase @Inject()
 
   val sessions = lifted.TableQuery[PetsSession]
 
-  val b = uuidToBlob _
   val t = offsetDateTimeToUtcTimestamp _
 
   def findBySessionId = dbRun(dbioFindBySessionId _) _
   def dbioFindBySessionId(sessionId: UUID): DBIO[Option[PetsSessionRow]] = {
     sessions
-      .filter(_.id === uuidToBlob(sessionId))
+      .filter(_.id === sessionId.toString)
       .take(1)
       .result
       .headOption
@@ -39,15 +37,15 @@ class SessionDatabase @Inject()
   def createSession = dbRun(dbioCreateSession _) _
   def dbioCreateSession(sessionId: UUID, userId: UUID, created: OffsetDateTime, isPermanent: Boolean): DBIO[I] = {
     sessions
-      .map(r => (r.id,         r.userId,  r.createdUtc, r.lastAccessedUtc, r.isPermanent))
-      .+= (     (b(sessionId), b(userId), t(created),   t(created),          isPermanent))
+      .map(r => (r.id,               r.userId,          r.createdUtc, r.lastAccessedUtc, r.isPermanent))
+      .+= (     (sessionId.toString,   userId.toString, t(created),   t(created),          isPermanent))
       .map(tott)
   }
 
   def deleteSession = dbRun(dbioDeleteSession _) _
   def dbioDeleteSession(sessionId: UUID): DBIO[I] = {
     sessions
-      .filter(_.id === uuidToBlob(sessionId))
+      .filter(_.id === sessionId.toString)
       .delete
       .map(tott)
   }

@@ -3,23 +3,17 @@ package models.forms
 import play.api.data._
 import play.api.data.Forms._
 
-case class CreateUser(
-  username:       String,
+case class UpdateUser(
   fullName:       Option[String],
-  password:       String,
-  passwordRepeat: String,
   isAdmin:        Boolean,
   isEnabled:      Boolean,
 )
 
-object CreateUser {
+object UpdateUser {
   
-  val form: Form[CreateUser] = Form(
+  val form: Form[UpdateUser] = Form(
     mapping(
-      "username"       -> nonEmptyText,
       "fullName"       -> optional(text),
-      "password"       -> nonEmptyText,
-      "passwordRepeat" -> nonEmptyText,
       "isAdmin"        -> boolean,
       "isEnabled"      -> boolean,
     )(apply)(unapply)

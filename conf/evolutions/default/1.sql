@@ -1,7 +1,7 @@
 -- !Ups
 
 CREATE TABLE pets_user(
-  id         VARBINARY(16) NOT NULL,
+  id         CHAR(36)     NOT NULL,
   username   VARCHAR(200) NOT NULL,
   full_name  TEXT,
   password   TEXT,
@@ -13,14 +13,14 @@ CREATE TABLE pets_user(
 );
 
 INSERT INTO pets_user
-  VALUES (UUID_TO_BIN(UUID()), 'root', 'root user', '$2a$10$gBcS2EngaWq1mRUOCowa9uZZ5AA4n2hFvWCmFx7CvrmzvZxCozhEW', TRUE, TRUE);
+  VALUES (UUID(), 'root', 'root user', '$2a$10$gBcS2EngaWq1mRUOCowa9uZZ5AA4n2hFvWCmFx7CvrmzvZxCozhEW', TRUE, TRUE);
 
 CREATE TABLE pets_session(
-  id                VARBINARY(16) NOT NULL,
-  user_id           VARBINARY(16) NOT NULL,
-  created_utc       DATETIME      NOT NULL,
-  last_accessed_utc DATETIME      NOT NULL,
-  is_permanent      BOOLEAN       NOT NULL DEFAULT 0,
+  id                CHAR(36) NOT NULL,
+  user_id           CHAR(36) NOT NULL,
+  created_utc       DATETIME NOT NULL,
+  last_accessed_utc DATETIME NOT NULL,
+  is_permanent      BOOLEAN  NOT NULL DEFAULT 0,
 
   PRIMARY KEY (id),
   INDEX ix_session_last_accessed(is_permanent, last_accessed_utc)

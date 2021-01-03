@@ -5,7 +5,6 @@ import java.util.UUID
 import extensions.aliases._
 import extensions.combinators._
 import extensions.db.DbRunHelpers
-import extensions.uuid._
 import javax.inject._
 import models.db.Tables._
 import play.api.db.slick._
@@ -27,7 +26,7 @@ class UserDatabase @Inject()
   def findById = dbRun(dbioFindById _) _
   def dbioFindById(userId: UUID): DBIO[Option[PetsUserRow]] = {
     users
-      .filter(_.id === uuidToBlob(userId))
+      .filter(_.id === userId.toString)
       .take(1)
       .result
       .headOption
@@ -48,8 +47,8 @@ class UserDatabase @Inject()
   def createUser = dbRun(dbioCreateUser _) _
   def dbioCreateUser(id: UUID, username: String, fullName: Option[String], password: Option[String], isAdmin: Boolean, isEnabled: Boolean): DBIO[I] = {
     users
-      .map(r => (r.id,             r.username, r.fullName, r.password, r.isAdmin, r.isEnabled))
-      .+= (     (  uuidToBlob(id),   username,   fullName,   password,   isAdmin,   isEnabled))
+      .map(r => (r.id,          r.username, r.fullName, r.password, r.isAdmin, r.isEnabled))
+      .+= (     (  id.toString,   username,   fullName,   password,   isAdmin,   isEnabled))
       .map(tott)
   }
 
@@ -57,15 +56,15 @@ class UserDatabase @Inject()
   def dbioUpdateUser(id: UUID)(f: PetsUserRow => PetsUserRow): DBIO[I] = {
     (for {
       oldUser <- dbio.optionT(dbioFindById(id))
-      newUser =  f(oldUser).copy(id = uuidToBlob(id))
-      _       <- dbio.some(users.update(newUser))
+      newUser =  f(oldUser).copy(id = oldUser.id)
+      _       <- dbio.some(users.insertOrUpdate(newUser))
     } yield tt).run.transactionally.map(tott)
   }
 
   def deleteUser = dbRun(dbioDeleteUser _) _
   def dbioDeleteUser(userId: UUID): DBIO[I] = {
     users
-      .filter(_.id === uuidToBlob(userId))
+      .filter(_.id === userId.toString)
       .delete
       .map(tott)
   }

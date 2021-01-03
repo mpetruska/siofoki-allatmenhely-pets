@@ -24,7 +24,7 @@ class UserAction @Inject() (
       sessionIdText <- future.fromOption(request.session.get("sessionId"))
       sessionId     <- future.fromOption(uuidFromString(sessionIdText))
       sessionRow    <- future.optionT(sessionDatabase.findBySessionId(sessionId))
-      userId        <- future.fromOption(uuidFromBlob(sessionRow.userId))
+      userId        <- future.fromOption(uuidFromString(sessionRow.userId))
       userRow       <- future.optionT(userDatabase.findById(userId))
     } yield new UserRequest(sessionRow, userRow, request))
       .run
