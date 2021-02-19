@@ -27,18 +27,7 @@ object Main extends App {
   val db     = dbFactory.forURL(url, driver = jdbcDriver, user = user, password = password, keepAliveConnection = true)
   val models = Await.result(db.run(profileInstance.createModel(Some(MTable.getTables(None, Some("dbo"), None, Some(Seq("TABLE", "VIEW")))), true)(ExecutionContext.global).withPinnedSession), Duration.Inf)
 
-  val generator = new SourceCodeGenerator(models) {
-
-    override def Table = new Table(_) {
-
-      override def Column = new Column(_) {
-        override def rawType = model.tpe match {
-          case "java.sql.Date" => "Option[java.sql.Date]"
-          case _               => super.rawType
-        }
-      }
-    }
-  }
+  val generator = new SourceCodeGenerator(models)
 
   println("Generating Slick models...")
   generator.writeToMultipleFiles(profile, outputDir, pkg)

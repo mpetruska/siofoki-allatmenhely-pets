@@ -1,7 +1,7 @@
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index()
 
-GET     /search/listalldogs         controllers.SearchController.listAllDogs()
+GET     /search/listallanimals      controllers.SearchController.listAllAnimals()
 
 # Administration
 
